@@ -2,7 +2,9 @@
 
 import sys
 import os
-
+'''
+Usage: python parse_csnap.py <brick_path> [<destination-path>]
+'''
 def parse (csnapFile, desPath = None):
     # open csnap file
     fToParse = open(csnapFile, 'r')
@@ -12,24 +14,41 @@ def parse (csnapFile, desPath = None):
     else:
         destFile = os.path.join(desPath, "CHANGELOG.SNAP")
 
-    fParsed = open (destFile, 'w')
+    print "Parsing CSNAP file %s to location %s" % (csnapFile, desPath)
+    try:
+        fParsed = open (destFile, 'w')
+    except OSError :
+        print "Unable to open: ", destFile
+        sys.exit(0)
     header = fToParse.readline()
-    print "HEADER:", header
+    #print "HEADER:", header
 
     while (True):
-        fopDetail = fToParse.read(38)
-        if len (fopDetail) == 0:
-            break
-        print "fop Detail: ", fopDetail
-        parsedDetail = ".gfid/" + fopDetail[1:-1] + '\n'
-        print "parsed Detail : ", parsedDetail
-        fParsed.write (parsedDetail)
+        try:
+            fopDetail = fToParse.read(38)
+            if len (fopDetail) == 0:
+                break
+            #print "fop Detail: ", fopDetail
+            parsedDetail = ".gfid/" + fopDetail[1:-1] + '\n'
+            #print "parsed Detail : ", parsedDetail
+            fParsed.write (parsedDetail)
+        except OSError:
+            print "Unable to update Parsed CSNAP file"
+            sys.exit(0)
 
-parse ("/export1/v1/b1/.glusterfs/changelogs/csnap/CHANGELOG.SNAP" , "/home/ajha")
+def main ():
+    if len (sys.argv) < 2:
+        print "Usage: python parse_csnap.py <brick_path> [<destination-path>]"
+        sys.exit(0)
+    brickPath = str (sys.argv[1])
+    csnapFile = os.path.join (brickPath,\
+                ".glusterfs/changelogs/csnap/CHANGELOG.SNAP")
+    print "Cnapath : ", csnapFile
+    if len (sys.argv) == 3:
+        desPath = str (sys.argv[2])
+        parse (csnapFile, desPath)
+    else:
+        parse (csnapFile)
 
-# [TODO]
-'''
-Add usage-detail
-Add errors, like existing csnap file or read write exceptions
-Handle all exception
-'''
+if __name__ == "__main__":
+    main()
