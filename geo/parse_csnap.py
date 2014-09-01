@@ -6,11 +6,7 @@ import os
 Usage: python parse_csnap.py <brick_path> [<destination-path>]
 '''
 
-def mountAndTouch (desCsnapPath):
-    with open(desCsnapPath, 'r') as f:
-        print f.read()
-    '''
-    print "striped desCnspFilePath :",desCsnapPath,":"
+def mountAndTouch (fParsed):
     volName = raw_input ("Please provide the volume name: ")
     tmpPath = "/tmp/aux_" + volName
     try:
@@ -22,23 +18,13 @@ def mountAndTouch (desCsnapPath):
                 volName + " " + tmpPath
     os.system (mountCmd)
 
-    fParsed = open (desCsnapPath, 'r')
-    print "Csnap File:%s" % desCsnapPath
-    print fParsed.read()
-    for i in range (4):
-        auxPath = fParsed.read(42)
-        print fParsed.read()
-        print "len : ", len (auxPath),"auxPath: ", auxPath
-        #if len (auxPath) == 0:
-        #    break
-        touchCmd = "touch " + auxPath
-        print "touchCmd ", touchCmd
+    for auxPath in fParsed:
+        touchCmd = "touch " + os.path.join(tmpPath,auxPath)
         os.system (touchCmd)
     # clean-up
     umountCmd = "umount " + tmpPath
     os.system (umountCmd)
     os.rmdir (tmpPath)
-    '''
         
 
 def parse (csnapFile, desPath = None):
@@ -52,7 +38,7 @@ def parse (csnapFile, desPath = None):
 
     print "Parsing CSNAP file %s to location %s" % (csnapFile, desPath)
     try:
-        fParsed = open (destFile, 'w')
+        fParsed = open (destFile, "w+")
     except OSError :
         print "Unable to open: ", destFile
         sys.exit(0)
@@ -71,16 +57,17 @@ def parse (csnapFile, desPath = None):
         except OSError:
             print "Unable to update Parsed CSNAP file"
             sys.exit(0)
-    os.fsync (fToParse)
-    fToParse.close()
+    os.fsync (fParsed)
     decision = raw_input ("Would you like to update xtime CSNAP files (y/N)")
     if decision == "N":
         sys.exit(0)
     elif decision == "y":
-        mountAndTouch (destFile)
+        mountAndTouch (fParsed)
     else:
         print "Invalid Input"
         sys.exit(0)
+        fParsed.close()
+    fParsed.close()
 
 def main ():
     if len (sys.argv) < 2:
@@ -89,11 +76,21 @@ def main ():
     brickPath = str (sys.argv[1])
     csnapFile = os.path.join (brickPath,\
                 ".glusterfs/changelogs/csnap/CHANGELOG.SNAP")
-    print "Cnapath : ", csnapFile
+    csnapDir = os.path.join (brickPath,\
+            ".glusterfs/changelogs/csnap")
+    print "csnapPath : ", csnapFile
     if len (sys.argv) == 3:
         desPath = str (sys.argv[2])
+        if csnapDir == desPath:
+            print "Destination provided is csnap path, please use another ",\
+                    "destination path"
+            sys.exit(0) 
         parse (csnapFile, desPath)
     else:
+        if csnapDir == str(os.getcwd()):
+            print "Destination provided is csnap path, please use another ",\
+                    "destination path"
+            sys.exit(0)
         parse (csnapFile)
 
 if __name__ == "__main__":
