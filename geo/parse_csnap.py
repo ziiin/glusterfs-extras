@@ -36,8 +36,11 @@ def mountAndTouch (fParsed):
         
 
 def parse (csnapFile, desPath = None):
-    # open csnap file
-    fToParse = open(csnapFile, 'r')
+    try:
+        fToParse = open(csnapFile, 'r')
+    except IOError:
+        print "Unable to open brick's csnap file"
+        sys.exit(0)
     destFile = None
     if desPath == None:
         destFile = "CHANGELOG.SNAP"
@@ -47,7 +50,7 @@ def parse (csnapFile, desPath = None):
     print "Parsing CSNAP file %s to location %s" % (csnapFile, desPath)
     try:
         fParsed = open (destFile, "w+")
-    except OSError :
+    except IOError :
         print "Unable to open: ", destFile
         sys.exit(0)
     header = fToParse.readline()
@@ -62,7 +65,7 @@ def parse (csnapFile, desPath = None):
             parsedDetail = ".gfid/" + fopDetail[1:-1] + '\n'
             print "parsed Detail : ", parsedDetail
             fParsed.write (parsedDetail)
-        except OSError:
+        except IOError:
             print "Unable to update Parsed CSNAP file"
             sys.exit(0)
     os.fsync (fParsed)
