@@ -4,6 +4,14 @@ import sys
 import os
 '''
 Usage: python parse_csnap.py <brick_path> [<destination-path>]
+
+@brick_path : Absolute path of the brick, same as shown in "gluster vol info"
+@destination-path : Any scratch-directory for intermediate processing purposes.
+                    When not provided make use of current-working-directory.
+
+* CHANGELOG.SNAP created at the destination-path includes gfids of probable
+  inconsistent files(gfid).
+* Can be deleted after the script exits.
 '''
 
 def mountAndTouch (fParsed):
