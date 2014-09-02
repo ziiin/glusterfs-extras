@@ -1,10 +1,10 @@
-## Post-Snap xtime inconsistency correction.
+# Post-Snap xtime inconsistency correction.
 
-# Issue:
+## Issue:
 * Geo-replication unable to sync few files to geo-rep slave for snapped
   volume.
 
-# Root-Cause:
+## Root-Cause:
 * During Barrier, file-operations other than rename and unlink were allowed.
   Among those file operations few actually hit the posix, are avilable in
   snapped volume but not recorded in changelogs of snapped volume.
@@ -14,11 +14,11 @@
   to slave. But marker translator being crash-inconsistent could not propagate
   xtime change till root. Hence missing the changes in xsync crawl too.
 
-# Result:
+## Result:
 * Inconsistency in Geo-replication session between snapped-master and
   its respective slave.
 
-# Soluton:
+## Soluton:
 * Modifications in changelog translator to barrier all but Data file-
   operations.
 * Modifications in changelog has been made to detect probable files that
@@ -26,8 +26,8 @@
   updation till root.
 * Running the Script "parse_csnap.py" would update xtime till root.
 
-# Usage:
+## Usage:
 * Start the snapped-volume. Before starting geo-replication session,
   run the provided python script on all bricks of the snapped-volume.
 * Requires name of the snapped volume.
-* $>> python parse_cnap.py <brick_path> [<destination-path>]
+* $>> python parse_cnap.py @brick_path [@destination-path]
