@@ -13,12 +13,15 @@
 ## Algo:
 
 * doOperation (currentFile):
+
 >       Based of file type apply discrimination and do the operation.
->
+
 * allThreadsTerminated():
+
 >       Checks each bit of isDone for the over-all termination status
->
+
 * Crawl (Qindex):
+
 >       while Qindex is outOfBound and (allThreadsTerminated() == True):
 >               if Qindex outOfBound:
 >                       continue
@@ -35,13 +38,14 @@
 >                         - (where key is absolute subdir path and value 0/1)
 >                         - (0: not crawled , 1: crawled)
 >               UNLOCK
->
+
 * masterCrawl (Q):
+
 >       init all threads maxThreads from index 0
 >               Crawl (0)
->       
->
+       
 * initCrawl (rootCrawlDir, maxThreads = 10):
+
 >       Initialize a global integer "isDone" to zero.
 >         - where each bit corresponds to its status, whether done or not.
 >       Initialize a Queue with rootCrawlDirectory with value as 0.
