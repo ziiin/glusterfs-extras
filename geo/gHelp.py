@@ -16,7 +16,17 @@ Features:
 '''
 def glMount (vol):
     ''' Returns mount path on successful mount, else None. '''
-    pass
+    mntPath = "/mnt/gHelp/aux_" + volName
+    try:
+        mkdirs (mntPath)
+    except IOError as e:
+        print "Unable to reCreate mount path, reason: ", e
+
+    mountCmd = "mount -t glusterfs -oaux-gfid-mount localhost:/" + \
+                volName + " " + mntPath
+    os.system (mountCmd)
+    
+    return mntPath
 
 def glGetBricks (vol):
     ''' Returns list of bricks associated to the volume, else None. '''
